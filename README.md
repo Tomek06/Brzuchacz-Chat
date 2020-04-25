@@ -1,1 +1,2 @@
 # Brzuchacz-Chat
+Bogdan-Edit
