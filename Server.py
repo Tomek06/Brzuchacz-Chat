@@ -8,6 +8,7 @@ s.listen(10)
 
 socket_list = {}
 client_list = {}
+message_list = {}
 
 name_header = 3
 msg_header = 8
@@ -24,16 +25,16 @@ def new_connections():
 def accept_msgs(client_socket):
     while True:
         msg = client_socket.recv(1024).decode("utf-8")
-        print(msg)
-        #print(msg[3:8+name_header])
         if msg[:8] == 'username':  # identify new users
             username_length = msg[8:8+name_header]
             client_list[msg[8+name_header:8+name_header+int(username_length)]] = client_socket
-            #print(client_list[client_socket])
         else:
             #sender length, msg length, sender, msg
+
+            
+            
             recipient_length = int(msg[0:name_header])
-            recipient = msg[name_header:name_header+recipient_length]
+            recipient = msg[name_header + msg_header:name_header+msg_header+recipient_length]
             
             msg_length = int(msg[name_header:name_header+msg_header]) # msg length
             msg_strip = msg[name_header + msg_header + recipient_length: name_header + msg_header + recipient_length + msg_length]  # pure msg
@@ -41,20 +42,18 @@ def accept_msgs(client_socket):
             for x, y in client_list.items():
                 if y == client_socket:
                     sender = x
-            
-            #adjusted_msg = f'{len(sender)<:{name_header}}' + f'{msg_length<:{msg_header}}' + sender + msg_strip #SOMETHING WRONG HERE
-            adjusted_msg = sender + msg_strip
-
+                    
+            adjusted_msg = f'{len(sender):<{name_header}}' + f'{msg_length:<{msg_header}}' + sender + msg_strip #SOMETHING WRONG HERE
             print(adjusted_msg)
 
-            if recipient in client_list:
+            print(recipient)
+            if recipient in client_list.keys():
                 try:
-                    client_list[recipient].send(bytes(adjusted_msg))
+                    client_list[recipient].send(bytes(adjusted_msg, "utf-8"))
                 except:
-                    message_list
+                    message_list[client_list[recipient]] = unread_msgs.append(adjusted_msgs)
             else:
-                #send "doesn't exist"
-                client_socket.send(bytes("no such user found"))
+                client_socket.send(bytes("no such user found", "utf-8"))
 
 t1 = threading.Thread(target=new_connections)
 t1.start()
