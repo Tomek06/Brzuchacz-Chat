@@ -31,8 +31,6 @@ def accept_msgs(client_socket):
         else:
             #sender length, msg length, sender, msg
 
-            
-            
             recipient_length = int(msg[0:name_header])
             recipient = msg[name_header + msg_header:name_header+msg_header+recipient_length]
             
